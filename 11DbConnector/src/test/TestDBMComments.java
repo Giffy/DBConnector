@@ -15,7 +15,8 @@ import test.TestDBManager.MockManager;
 public class TestDBMComments {
 
 	
-	@Test
+	// @Test
+	@Deprecated
 	public void testInsert(){
 		boolean result=true;
 		
@@ -111,26 +112,62 @@ public class TestDBMComments {
 	}
 		
 	
+
 	@Test
-	public void testSelect(){
+	public void testDeleteAll(){
+	
 		boolean result=true;
 		DBMComments dbManager = new DBMComments("localhost", "dbtest2", "comments");
 		
-		Comments comments1 = getMockDBMComments("User1" , "user1@poo.com"); 
-		Comments comments2 = getMockDBMComments("User2" , "user21@poo.com");
-		Comments comments3 = getMockDBMComments("User3" , "user3@poo.com");
-		Comments comments4 = getMockDBMComments("User4" , "user4@poo.com");
+		try {
+			dbManager.connect("root","");
+			dbManager.deleteAll();
+		}catch (Exception e) {					// o agrupadas porque ambas descienden de Exception  
+			result = false;
+			e.printStackTrace();
+			
+		} finally{
+			dbManager.close();
+		}
 		
-		ArrayList<Comments> results = null;
+		Assert.assertEquals(true, result);
+		
+	
+	}
+	
+	
+	@Test
+	public void testSelect(){
+		
+		boolean result=true;
+		DBMComments dbManager = new DBMComments("localhost", "dbtest2", "comments");
+				
+		Comments comments1 = getMockDBMComments("User1" , "user1@poo.com"); 
+		Comments comments2 = getMockDBMComments("User2" , "user2@poo.com");
+		Comments comments3 = getMockDBMComments("User1" , "user3@poo.com");
+		Comments comments4 = getMockDBMComments("User4" , "user4@poo.com");
+		Comments comments5 = getMockDBMComments("Jordi" , "user4@poo.com");
+		
+		ArrayList<Comments> results1 = null;
+		ArrayList<Comments> results2 = null;
+		ArrayList<Comments> results3 = null;
 		
 		try {
 			dbManager.connect("root","");
+			
+			dbManager.deleteAll();
+			
 			dbManager.insert(comments1);
 			dbManager.insert(comments2);
 			dbManager.insert(comments3);
 			dbManager.insert(comments4);
+			dbManager.insert(comments5);
 							
-			results = dbManager.select("myuser", "user");
+			results1 = dbManager.select("myuser", "LIKE", "User%");
+			results2 = dbManager.select("myuser", "=", "'User1'");
+			results3 = dbManager.select("id", "BETWEEN", "2 AND 5");
+					
+			
 						
 		} catch (Exception e) {					// o agrupadas porque ambas descienden de Exception  
 			result = false;
@@ -141,8 +178,9 @@ public class TestDBMComments {
 		}
 		
 		Assert.assertEquals(true, result);
-	//	Assert.assertEquals(comments1.getMyUser(),results.getMyUser()); 
-	//	Assert.assertEquals(comments1.getComments(),results.getComments()); 
+		Assert.assertEquals(4, results1.size());
+ 		Assert.assertEquals(2, results2.size());
+		Assert.assertEquals(4, results3.size());
 	}
 		
 	

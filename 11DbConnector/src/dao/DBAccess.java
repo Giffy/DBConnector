@@ -52,7 +52,7 @@ public interface DBAccess <T>{
 	 * @return
 	 * @throws SQLException 
 	 */
-	public ArrayList<T> select(String column, String value) throws SQLException;
+	public ArrayList<T> select (String column, String operador, String value) throws SQLException;
 	
 	/**
 	 * Elimina el registro segun el id

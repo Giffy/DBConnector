@@ -1,6 +1,7 @@
 package test;
 
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -55,6 +56,7 @@ public class TestDBManager {
 
 	
 	
+	@SuppressWarnings("rawtypes")
 	public static class MockManager extends DBManager {
 		public MockManager(){
 			super ("localhost", "dbtest2", "comments");
@@ -75,8 +77,26 @@ public class TestDBManager {
 			return null;
 		}
 
-		@Override
+		
 		public ArrayList select(String column, String value) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		protected ArrayList resultSetToGeneric(ResultSet resultSet2) throws SQLException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public ArrayList select(String column, String operador, String value) throws SQLException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		protected Object mapDbToObject(ResultSet resultSet) throws SQLException {
 			// TODO Auto-generated method stub
 			return null;
 		}

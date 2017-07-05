@@ -98,79 +98,28 @@ public class DBMComments extends DBManager<Comments> {
 	}
 		
 		
-		
-	
-	
 	
 
-
-	@Override
-	public Comments select(int id) throws SQLException {
-		
-		String strSQL = "SELECT id, myuser, email, webpage, summary, datum, comments FROM " + 
-				getDbTable() + " WHERE id = ?";
-		
-		PreparedStatement preparedStatement=null;
-		Comments comment = null;		
-		try{
-			preparedStatement = getConnected()
-				 	.prepareStatement(strSQL);
+    
+	/**
+	 * Verifica que la operacion sea valida
+	 * @param operador
+	 */
 	
-			preparedStatement.setInt(1, id);
-			
-			ResultSet resultSet = preparedStatement.executeQuery();
-			
-			ArrayList<Comments> list = resultSetToComments(resultSet);
-			comment= list.get(0);
-			
-		}catch (SQLException e){
-			close();
-			throw e;
-		}
-			
-		return comment;
+	
+	private void checkOperador(String operador) {
+		ArrayList<String> columns = new ArrayList<String>(
+				Arrays.asList("=", "!=", "<>", "<", ">", "<=", ">=", "LIKE", "BETWEEN", "IN"));
+		if(!columns.contains(operador))
+			throw new RuntimeException("Error la columna "+ operador + " no es valido");
+		
 	}
 
-
-
-	@Override
-	public ArrayList<Comments> select(String column, String value) throws SQLException {
-		
-		checkColumn(column);	
-		
-		String strSQL = "SELECT id, myuser, email, webpage, summary, datum, comments FROM " + 
-				getDbTable() + " WHERE "+ column + " = ?";
-		
-		PreparedStatement preparedStatement=null;
-		Comments comment = null;		
-		ArrayList<Comments> list = null;
-		try{
-			preparedStatement = getConnected()
-				 	.prepareStatement(strSQL);
-	
-			preparedStatement.setString(1, value);
-			
-			ResultSet resultSet = preparedStatement.executeQuery();
-			
-			list = resultSetToComments(resultSet);
-			
-			
-		}catch (SQLException e){
-			close();
-			throw e;
-		}
-		
-		return list;
-	}
-
-	
-	
-	
 	private void checkColumn(String column) {
 		ArrayList<String> columns = new ArrayList<String>(
 				Arrays.asList("id", "myuser", "email", "datum", "webpage", "summary", "comments"));
 		if(!columns.contains(column))
-			throw new RuntimeException("Error la columna no existe en la base de datos");
+			throw new RuntimeException("Error la " + column + " no existe en la base de datos");
 		
 	}
 
@@ -193,7 +142,7 @@ public class DBMComments extends DBManager<Comments> {
 	}
 	
 	
-	private ArrayList<Comments> resultSetToComments(ResultSet resultSet) throws SQLException {
+	 private ArrayList<Comments> resultSetToComments(ResultSet resultSet) throws SQLException {
 		ArrayList<Comments> list = new ArrayList<>();
 		
 		while (resultSet.next()) {
@@ -223,9 +172,147 @@ public class DBMComments extends DBManager<Comments> {
 		
 		return list;
 	}
+
+	@Override
+	protected Comments mapDbToObject(ResultSet resultSet) throws SQLException {
+		// lee el resultado i 
+
+    	int id = resultSet.getInt("id");
+        String user = resultSet.getString("myuser");
+        String email = resultSet.getString("email");
+        String webpage = resultSet.getString("webpage");
+        String summary = resultSet.getString("summary");
+        Date date = resultSet.getDate("datum");
+        String comments = resultSet.getString("comments");
+  
+
+        Comments comment = new Comments();    
+        comment.setId(id);
+        comment.setEmail(email);
+        comment.setDatum(date);
+        comment.setMyUser(user);
+        comment.setSummary(summary);
+        comment.setComments(comments);
+        comment.setWebpage(webpage);
+
+        return comment; 
+	}
+
+	 
+	 
 	
+
+
 	
+	// TODO   to delete
+	/*
+	public Comments select(int id) throws SQLException {
+		
+		String strSQL = "SELECT id, myuser, email, webpage, summary, datum, comments FROM " + 
+				getDbTable() + " WHERE id = ?";
+		
+		PreparedStatement preparedStatement=null;
+		Comments comment = null;		
+		try{
+			preparedStatement = getConnected()
+				 	.prepareStatement(strSQL);
 	
+			preparedStatement.setInt(1, id);
+			
+			ResultSet resultSet = preparedStatement.executeQuery();
+			
+			ArrayList<Comments> list = resultSetToComments(resultSet);
+			comment= list.get(0);
+			
+		}catch (SQLException e){
+			throw e;
+		}
+			
+		return comment;
+	}
 	
+	/**
+     *  Recupera todos los registros con la condicion que:
+     *  
+     *  la columna column operador Value, donde pueder ser:
+     *  
+     *   = 'value'
+     *  != 'value'
+     *   > 'value'
+     *   < 'value'
+     *  >= 'value'
+     *  <= 'value'
+     *  BETWEEN
+     *  LIKE 'value%'    // use el % para indicar cualquier cosa
+     *  
+     * 
+     * 
+     */
+    /*
+	@Override
+	public ArrayList<Comments> select(String column, String operador,  String value) throws SQLException {
+		
+		checkColumn(column);
+		checkOperador(operador);
+		
+		value= operador.contains("LIKE")? "'" +value +"'": value;
+		
+		String strSQL = "SELECT * FROM "+ 
+				getDbTable() + " WHERE "+ column + " " + operador + " "+ value;
+		
+		PreparedStatement preparedStatement=null;
+		Comments comment = null;		
+		ArrayList<Comments> list = null;
+		try{
+			preparedStatement = getConnected()
+				 	.prepareStatement(strSQL);
+				
+			ResultSet resultSet = preparedStatement.executeQuery();
+			list = resultSetToComments(resultSet);
+						
+		}catch (SQLException e){
+			throw e;
+		}finally{
+			try{
+				preparedStatement.close();
+			}catch (Exception e1){
+			}
+		}
+		
+		return list;
+	}
+	
+	*/
+	/*
+	 @Override
+		protected ArrayList<Comments> resultSetToGeneric(ResultSet resultSet2) throws SQLException {
+			ArrayList<Comments> list = new ArrayList<>();
+			
+			while (resultSet2.next()) {
+				
+				// lee el resultado i 
+	        	int id = resultSet2.getInt("id");
+	            String user = resultSet2.getString("myuser");
+	            String email = resultSet2.getString("email");
+	            String webpage = resultSet2.getString("webpage");
+	            String summary = resultSet2.getString("summary");
+	            Date date = resultSet2.getDate("datum");
+	            String comments = resultSet2.getString("comments");
+	                        
+	            Comments comment = new Comments(); 
+
+	            comment.setId(id);
+	            comment.setEmail(email);
+	            comment.setDatum(date);
+	            comment.setMyUser(user);
+	            comment.setSummary(summary);
+	            comment.setComments(comments);
+	            comment.setWebpage(webpage);
+	            
+	            list.add(comment);            
+			}
+			return list;
+		}
+	 	*/
 	
 }
